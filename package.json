@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-pdf-viewer",
+  "name": "cordova-plugin-pdf-viewer-ios",
   "version": "1.0.0",
   "description": "cordova pdf viewer plugin",
   "cordova": {
-    "id": "cordova-plugin-pdf-viewer",
+    "id": "cordova-plugin-pdf-viewer-ios",
     "platforms": [
       "ios"
     ]
@@ -25,7 +25,8 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm publish --access public"
   },
   "repository": {
     "type": "git",
