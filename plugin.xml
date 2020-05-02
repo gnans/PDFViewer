@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+        xmlns:android="http://schemas.android.com/apk/res/android" 
+        id="cordova-plugin-pdf-viewer" 
+        version="1.0.0">
+    <engines>
+        <engine name="cordova" version=">=7.1.0" />
+        <engine name="cordova-ios" version=">=4.5.1" />
+    </engines>
+   <name>PDFViewer</name>
+   <js-module name="PDFViewer" src="www/PDFViewer.js">
+      <clobbers target="cordova.plugins.PDFViewer" />
+   </js-module>
+   <platform name="ios">
+      <config-file parent="/*" target="config.xml">
+         <feature name="PDFViewer">
+            <param name="ios-package" value="PDFViewer" />
+         </feature>
+      </config-file>
+      <framework src="PDFKit.framework" custom="false"></framework>
+      <source-file src="src/ios/PDFViewer.m" />
+   </platform>
+</plugin>

@@ -1,0 +1,38 @@
+{
+  "name": "cordova-plugin-pdf-viewer",
+  "version": "1.0.0",
+  "description": "cordova pdf viewer plugin",
+  "cordova": {
+    "id": "cordova-plugin-pdf-viewer",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "pdf"
+  ],
+  "engines": {
+    "cordovaDependencies": {
+      "1.0.0": {
+        "cordova": ">=7.1.0",
+        "cordova-ios": ">=4.5.1"
+      }
+    }
+  },
+  "author": "Gnanasekaran Perumal",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnans/PDFViewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gnans/PDFViewer/issues"
+  },
+  "homepage": "https://github.com/gnans/PDFViewer#readme"
+}
