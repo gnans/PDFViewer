@@ -14,8 +14,8 @@ function opts(options) {
   options.shareBtnText = options.shareBtnText || "share";
   options.printBtnColour = options.printBtnColour || "#000000";
   options.printBtnText = options.printBtnText || "print";
-  options.showShareBtn = options.showShareBtn || true;
-  options.showPrintBtn = options.showPrintBtn || true;
+  options.showShareBtn = options.showShareBtn || "true";
+  options.showPrintBtn = options.showPrintBtn || "true";
   options.pdfBackgroundColour = options.pdfBackgroundColour || "#ababab";
 
   return options;
