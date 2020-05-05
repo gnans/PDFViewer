@@ -11,7 +11,15 @@
   "keywords": [
     "ecosystem:cordova",
     "cordova-ios",
-    "pdf"
+    "pdf",
+    "cordova-plugin-pdf-viewer",
+    "pdf-viewer",
+    "pdf-viewr-ios",
+    "ios",
+    "cordova-plugin-pdf-viewer-ios",
+    "PDFViewer",
+    "cordova-pdf-viewer",
+    "cordova-plugin"
   ],
   "engines": {
     "cordovaDependencies": {
