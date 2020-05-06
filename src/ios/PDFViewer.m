@@ -16,8 +16,13 @@
         NSString* direction = [command.arguments objectAtIndex:3];
         NSString* fileName = [command.arguments objectAtIndex:4];
         NSString* pdfBackgroundColour = [command.arguments objectAtIndex:16];
+        NSString* disableCopy = [command.arguments objectAtIndex:17];
         
+        self.base64Str = base64Str;
         self.fileName = fileName;
+        BOOL isCopyDisabled = [disableCopy boolValue];
+        
+        self.pdfDocument = [[PDFDocument alloc] initWithData:[self getBase64Data]];
         
         [self setToolbar];
        
@@ -30,10 +35,12 @@
         self.pdfView.backgroundColor = [self colorWithHexString:pdfBackgroundColour alpha:1];
         self.pdfView.autoScales = true;
         [self.pdfView sizeToFit];
-    
-        NSData* data = [[NSData alloc] initWithBase64EncodedString:base64Str options: NSDataBase64DecodingIgnoreUnknownCharacters];
-        self.pdfDocument = [[PDFDocument alloc] initWithData:data];
         
+        if(isCopyDisabled) {
+            UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+            [self.pdfView addGestureRecognizer:longPress];
+        }
+    
         self.pdfView.document = self.pdfDocument;
         
         if(![pageNoStr isEqual:[NSNull null]]) {
@@ -58,6 +65,62 @@
     }
 }
 
+-(void)sharePDF:(CDVInvokedUrlCommand*)command {
+    self.command = command;
+    
+    @try {
+        NSString* base64Str = [command.arguments objectAtIndex:0];
+        NSString* fileName = [command.arguments objectAtIndex:1];
+        NSString* shareText = [command.arguments objectAtIndex:2];
+        
+        self.base64Str = base64Str;
+        self.fileName = fileName;
+        
+        NSData* data = [self getBase64Data];
+        
+        [self shareFn:nil base64:data shareText:shareText callback:^(BOOL handler) {
+            NSString* msg = handler ? nil: @"failed";
+            [self sendPluginResult:msg];
+        }];
+    } @catch(NSException* exception) {
+        [self sendPluginResult: exception.reason];
+    }
+}
+
+-(void)printPDF:(CDVInvokedUrlCommand*)command {
+    self.command = command;
+    
+    @try {
+        NSString* base64Str = [command.arguments objectAtIndex:0];
+        NSString* fileName = [command.arguments objectAtIndex:1];
+        
+        self.base64Str = base64Str;
+        self.fileName = fileName;
+        
+        NSData* data = [self getBase64Data];
+        
+        [self printFn:data callback:^(BOOL handler) {
+            NSString* msg = handler ? nil: @"failed";
+            [self sendPluginResult:msg];
+        }];
+    } @catch(NSException* exception) {
+        [self sendPluginResult: exception.reason];
+    }
+}
+
+-(NSData *)getBase64Data {
+    NSData* data = [[NSData alloc] initWithBase64EncodedString:self.base64Str options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    return data;
+}
+
+- (UILongPressGestureRecognizer *)handleLongPress:(UILongPressGestureRecognizer *) recognizer {
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
+        recognizer.enabled = false;
+    }
+    
+    return recognizer;
+}
+
 - (void) viewWillTransitionToSizeNotification:(NSNotification *) notification
 {
     if ([[notification name] isEqualToString:CDVViewWillTransitionToSizeNotification]) {
@@ -67,6 +130,7 @@
         [self.webView layoutSubviews];
     }
 }
+
 
 -(UIColor *)colorWithHexString:(NSString *)str_HEX  alpha:(CGFloat)alpha_range{
     int red = 0;
@@ -133,7 +197,7 @@
     if(isShareBtnEnabled) {
        /* share button */
        self.shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-       [self.shareBtn addTarget:self action:@selector(sharePDF:) forControlEvents:UIControlEventTouchUpInside];
+       [self.shareBtn addTarget:self action:@selector(share:) forControlEvents:UIControlEventTouchUpInside];
        [self.shareBtn setTitle:shareBtnText forState:UIControlStateNormal];
        [self.shareBtn setTitleColor:[self colorWithHexString:shareBtnColour alpha:1] forState:UIControlStateNormal];
        self.shareBtn.frame = CGRectZero;
@@ -151,7 +215,7 @@
     if(isPrintBtnEnabled) {
         /* print button */
         self.printBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.printBtn addTarget:self action:@selector(printPDF:) forControlEvents:UIControlEventTouchUpInside];
+        [self.printBtn addTarget:self action:@selector(print:) forControlEvents:UIControlEventTouchUpInside];
         [self.printBtn setTitle:printBtnText forState:UIControlStateNormal];
         [self.printBtn setTitleColor:[self colorWithHexString:printBtnColour alpha:1] forState:UIControlStateNormal];
         self.printBtn.frame = CGRectZero;
@@ -170,7 +234,6 @@
 }
 
 -(NSString*)getPath {
-    
     @try {
         NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString* rootPath = paths[0];
@@ -180,18 +243,19 @@
     }
 }
 
--(NSString*)writeFileTo {
+-(NSURL*)writeFileTo:(NSData *)data {
     @try {
         NSString* path = [self getPath];
         NSString* nameWithoutExtension = [self.fileName stringByDeletingPathExtension];
         NSString* ext = [self.fileName pathExtension];
         path = [path stringByAppendingPathComponent:nameWithoutExtension];
         path = [path stringByAppendingPathExtension:ext];
+        NSURL *url = [NSURL fileURLWithPath:path];
         
-        BOOL completion = [self.pdfDocument writeToFile:path];
+        BOOL completion = [data writeToURL:url atomically:YES];
         
         if(completion) {
-            return path;
+            return url;
         } else {
             @throw @"Unexcepted error: write file failed";
         }
@@ -201,10 +265,10 @@
    }
 }
 
--(void)removeFile:(NSString* )path {
+-(void)removeFile:(NSURL* )url {
     @try {
         NSError* error = nil;
-        [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
+        [[NSFileManager defaultManager] removeItemAtURL:url error:&error];
         if(error != nil) {
             @throw error.localizedDescription;
         }
@@ -226,41 +290,35 @@
    [self sendPluginResult: msg];
 }
 
--(void)printPDF:(UIButton* )sender {
-    @try {
-        NSString* path = [self writeFileTo];
-      
-        NSData* pdfData = [NSData dataWithContentsOfFile:path];
-        UIPrintInteractionController* printController = [UIPrintInteractionController sharedPrintController];
-        BOOL canPrint = [UIPrintInteractionController canPrintData:pdfData];
-        if(canPrint) {
-            printController.printingItem = pdfData;
-            printController.showsPaperSelectionForLoadedPapers = YES;
-            printController.showsNumberOfCopies = NO;
-            
-            UIPrintInfo* printInfo = [UIPrintInfo printInfo];
-            printInfo.outputType = UIPrintInfoOutputGeneral;
-            printController.printInfo = printInfo;
-            
-            UIPrintInteractionCompletionHandler completionHandler = ^(UIPrintInteractionController * printConroller, BOOL completed, NSError *error) {
-                [self removeFile:path];
-            };
-            
-            [printController presentAnimated:YES completionHandler: completionHandler];
-        } else {
-            @throw @"Unexcepted error: cannot print this file";
-        }
-    } @catch(NSException* exception) {
-        @throw exception;
-    }
+-(void)sendPluginResult:(NSString* )msg {
+    if(msg != nil) {
+        self.pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:msg];
+   } else {
+       self.pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: @"success"];
+   }
+
+   [self.commandDelegate sendPluginResult:self.pluginResult callbackId:self.command.callbackId];
 }
 
--(void)sharePDF:(UIButton* )sender {
+
+-(void)share:(UIButton* )sender {
+    NSData* data = [self getBase64Data];
+    NSString* shareText = [self.command.arguments objectAtIndex:18];
+    [self shareFn:sender base64:data shareText:shareText callback:nil];
+}
+
+-(void)shareFn:(UIButton* _Nullable)sender base64:(NSData *)data shareText:(NSString* _Nullable)text callback:(nullable void(^)(BOOL))handler {
     @try {
-        NSString* path = [self writeFileTo];
+        NSURL* fileURL = [self writeFileTo: data];
         
-        NSData* pdfData = [NSData dataWithContentsOfFile:path];
-        NSArray* activityItems = @[pdfData];
+        NSMutableArray *activityItems = [[NSMutableArray alloc] init];
+        
+        if([text length] != 0) {
+            [activityItems addObject:text];
+        }
+        
+        [activityItems addObject:fileURL];
+        
         UIActivityViewController* activityViewControntroller = [[UIActivityViewController alloc] initWithActivityItems:activityItems  applicationActivities:nil];
         activityViewControntroller.excludedActivityTypes = @[
               UIActivityTypeAssignToContact,
@@ -272,26 +330,64 @@
               @"com.apple.reminders.RemindersEditorExtension"
         ];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            activityViewControntroller.popoverPresentationController.sourceView = sender;
-            activityViewControntroller.popoverPresentationController.sourceRect = sender.bounds;
+            
+            if(sender != nil) {
+                activityViewControntroller.popoverPresentationController.sourceView = sender;
+                activityViewControntroller.popoverPresentationController.sourceRect = sender.bounds;
+            } else {
+                activityViewControntroller.popoverPresentationController.sourceView = self.webView;
+                activityViewControntroller.popoverPresentationController.sourceRect = CGRectMake(self.webView.bounds.size.width/2, self.webView.bounds.size.height/4, 0, 0);
+            }
+           
         }
         
-        [self.viewController presentViewController:activityViewControntroller animated:YES completion:^{
-            [self removeFile:path];
+        [activityViewControntroller setCompletionWithItemsHandler:^(UIActivityType activityType, BOOL completed, NSArray *returnedItems, NSError *error) {
+            if(activityType == nil && handler != NULL) {
+                 [self removeFile:fileURL];
+                handler(completed);
+            }
         }];
+        
+        [self.viewController presentViewController:activityViewControntroller animated:YES completion:nil];
     } @catch(NSException* exception) {
         @throw exception;
     }
 }
 
--(void)sendPluginResult:(NSString* )msg {
-    if(msg != nil) {
-        self.pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:msg];
-   } else {
-       self.pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: @"success"];
-   }
+-(void)print:(UIButton* )sender {
+    NSData* data = [self getBase64Data];
+    [self printFn:data callback:nil];
+}
 
-   [self.commandDelegate sendPluginResult:self.pluginResult callbackId:self.command.callbackId];
+-(void)printFn:(NSData *)data callback:(nullable void(^)(BOOL))handler {
+    @try {
+        NSURL* fileURL = [self writeFileTo: data];
+        
+        UIPrintInteractionController* printController = [UIPrintInteractionController sharedPrintController];
+        BOOL canPrint = [UIPrintInteractionController canPrintURL:fileURL];
+        if(canPrint) {
+            printController.printingItem = fileURL;
+            printController.showsPaperSelectionForLoadedPapers = YES;
+            printController.showsNumberOfCopies = NO;
+
+            UIPrintInfo* printInfo = [UIPrintInfo printInfo];
+            printInfo.outputType = UIPrintInfoOutputGeneral;
+            printController.printInfo = printInfo;
+
+            UIPrintInteractionCompletionHandler completionHandler = ^(UIPrintInteractionController * printConroller, BOOL completed, NSError *error) {
+                [self removeFile:fileURL];
+                if(handler != NULL) {
+                    handler(completed);
+                }
+            };
+
+            [printController presentAnimated:YES completionHandler: completionHandler];
+        } else {
+            @throw @"Unexcepted error: cannot print this file";
+        }
+    } @catch(NSException* exception) {
+        @throw exception;
+    }
 }
 
 @end

@@ -17,6 +17,8 @@ function opts(options) {
   options.showShareBtn = options.showShareBtn || "true";
   options.showPrintBtn = options.showPrintBtn || "true";
   options.pdfBackgroundColour = options.pdfBackgroundColour || "#ababab";
+  options.disableCopy = options.disableCopy || "true";
+  options.shareText = options.shareText || "";
 
   return options;
 }
@@ -33,8 +35,9 @@ function validate(param, message) {
 
 exports.viewPDF = function (data, options) {
   return new Promise((resolve, reject) => {
-    validate(data, "base64 string required");
     options = opts(options);
+    validate(data, "base64 string required");
+    validate(options.fileName, "fileName is required");
 
     cordova.exec(resolve, reject, "PDFViewer", "viewPDF", [
       data,
@@ -53,7 +56,37 @@ exports.viewPDF = function (data, options) {
       options.printBtnText,
       options.showShareBtn,
       options.showPrintBtn,
-      options.pdfBackgroundColour
+      options.pdfBackgroundColour,
+      options.disableCopy,
+      options.shareText
+    ]);
+  });
+};
+
+
+exports.sharePDF = function (data, options) {
+  return new Promise((resolve, reject) => {
+    options = opts(options);
+    validate(data, "base64 string required");
+    validate(options.fileName, "fileName is required");
+
+    cordova.exec(resolve, reject, "PDFViewer", "sharePDF", [
+      data,
+      options.fileName,
+      options.shareText
+    ]);
+  });
+};
+
+exports.printPDF = function (data, options) {
+  return new Promise((resolve, reject) => {
+    options = opts(options);
+    validate(data, "base64 string required");
+    validate(options.fileName, "fileName is required");
+
+    cordova.exec(resolve, reject, "PDFViewer", "printPDF", [
+      data,
+      options.fileName
     ]);
   });
 };
