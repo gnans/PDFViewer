@@ -1,5 +1,6 @@
 # PDFViewer
-cordova pdf viewer plugin
+
+This plugin allows you to view pdf file base64 using ios native library PDFKit and it has print and share functionality also.
 
 ## Supported Platforms ##
 
@@ -36,7 +37,22 @@ PDFViewer.viewPDF(base64, options);
 const options = {
   page: 1,
   mode: 0,
-  direction: "vertical"
+  direction: "vertical",
+  fileName: "dummy.pdf",
+  toolbarColour: "#ababab",
+  doneBtnColour: "#ababab",
+  doneBtnText: "done",
+  titleColour: "#000000",
+  titleText: "dummy",
+  shareBtnColour: "#000000",
+  shareBtnText: "share",
+  printBtnColour: "#000000",
+  printBtnText: "print",
+  showShareBtn: "true",
+  showPrintBtn: "true",
+  pdfBackgroundColour: "#ababab",
+  disableCopy: "true",
+  shareText: "Hello, World"
 };
 ```
 
@@ -56,3 +72,64 @@ const options = {
 ##### direction
 
 - Its take ```vertical or horizontal``` this specify the display direction of the document.
+
+##### fileName
+
+- Its take name of the file with extension like this ```dummy.pdf```
+
+##### toolbarColour
+
+- Its take toolbar colour code in hexadecimal format
+
+##### doneBtnColour
+
+- Its take done button colour code in hexadecimal format
+
+##### doneBtnText
+
+- Its take done button text which is visible to user instead of button
+
+##### titleColour
+
+- Its take title text colour code in hexadecimal format
+
+##### titleText
+
+- Its take title text which is visible in toolbar center
+
+##### shareBtnColour
+
+- Its take share button colour code in hexadecimal format
+
+##### shareBtnText
+
+- Its take share button text which is visible to user instead of button
+
+##### printBtnColour
+
+- Its take print button colour code in hexadecimal format
+
+##### printBtnText
+
+- Its take print button text which is visible to user instead of button
+
+##### pdfBackgroundColour
+
+- Its take background colour code in hexadecimal format
+
+##### disableCopy
+
+- Its take values as ```"true" or "false"``` to disable or enable copy text from pdf
+
+#### shareText
+
+- Its take values to share with pdf file like title or description
+
+##### showShareBtn
+
+- Its take values as ```"true" or "false"``` to show or hide share button 
+
+##### showPrintBtn
+
+- Its take values as ```"true" or "false"``` to show or hide print button 
+
