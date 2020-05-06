@@ -125,3 +125,11 @@ const options = {
 
 - Its take values to share with pdf file like title or description
 
+##### showShareBtn
+
+- Its take values as ```"true" or "false"``` to show or hide share button 
+
+##### showPrintBtn
+
+- Its take values as ```"true" or "false"``` to show or hide print button 
+
