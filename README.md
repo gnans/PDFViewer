@@ -52,7 +52,9 @@ const options = {
   showPrintBtn: "true",
   pdfBackgroundColour: "#ababab",
   disableCopy: "true",
-  shareText: "Hello, World"
+  shareText: "Hello, World",
+  signPDF: "false",
+  signaturePlaceHolders: []
 };
 ```
 
@@ -133,3 +135,25 @@ const options = {
 
 - Its take values as ```"true" or "false"``` to show or hide print button 
 
+##### signPDF
+
+- Its take values as ```"true" or "false"``` to enable or disable digital signature in pdf
+
+#### signaturePlaceHolders
+
+- Its take values as 
+
+```js
+[{
+  sid: "Signature1",
+  page: 4, //page no
+  x: 420.0, // coordinate for placeholder box
+  y: 600.0, // coordinate for placeholder box
+  width: 100, // width for placeholder box and signature
+  height: 30, // height for placeholder box and signature
+  dx: 420.0, // coordinate for signature
+  dy: 150.0, // coordinate for signature
+  optional: "false",
+  signatureTitle: "Signature of Application"
+}]
+```

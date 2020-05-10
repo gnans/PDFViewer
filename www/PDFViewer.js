@@ -19,6 +19,8 @@ function opts(options) {
   options.pdfBackgroundColour = options.pdfBackgroundColour || "#ababab";
   options.disableCopy = options.disableCopy || "true";
   options.shareText = options.shareText || "";
+  options.signPDF = options.signPDF || "false";
+  options.signaturePlaceHolders = options.signaturePlaceHolders || [];
 
   return options;
 }
@@ -58,7 +60,9 @@ exports.viewPDF = function (data, options) {
       options.showPrintBtn,
       options.pdfBackgroundColour,
       options.disableCopy,
-      options.shareText
+      options.shareText,
+      options.signPDF,
+      options.signaturePlaceHolders
     ]);
   });
 };
