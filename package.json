@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-pdf-viewer-ios",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "cordova pdf viewer plugin",
   "cordova": {
     "id": "cordova-plugin-pdf-viewer-ios",

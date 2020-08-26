@@ -53,7 +53,7 @@
         }
         
         if(!self.pdfView.document.pageCount) {
-            @throw @"pages not found in pdf document";
+            @throw [NSException exceptionWithName:@"ExceptionalCircumstances" reason:@"pages not found in pdf document" userInfo:nil];
         }
         
         [self.pdfWebview addSubview:self.pdfView];
@@ -271,7 +271,7 @@
         if(completion) {
             return url;
         } else {
-            @throw @"Unexcepted error: write file failed";
+            @throw [NSException exceptionWithName:@"ExceptionalCircumstances" reason:@"Unexcepted error: write file failed" userInfo:nil];
         }
     } @catch(NSException* exception) {
         @throw exception;
@@ -283,7 +283,7 @@
         NSError* error = nil;
         [[NSFileManager defaultManager] removeItemAtURL:url error:&error];
         if(error != nil) {
-            @throw error.localizedDescription;
+            @throw [NSException exceptionWithName:@"ExceptionalCircumstances" reason:error.localizedDescription userInfo:nil];
         }
     } @catch(NSException* exception) {
          @throw exception;
@@ -399,7 +399,7 @@
 
             [printController presentAnimated:YES completionHandler: completionHandler];
         } else {
-            @throw @"Unexcepted error: cannot print this file";
+            @throw [NSException exceptionWithName:@"ExceptionalCircumstances" reason:@"Unexcepted error: cannot print this file" userInfo:nil];
         }
     } @catch(NSException* exception) {
         @throw exception;
