@@ -1,6 +1,6 @@
 # PDFViewer
 
-This plugin allows you to view pdf file base64 using ios native library PDFKit and it has print and share functionality also.
+This plugin allows you to view pdf file base64 using ios native library PDFKit and it has print, digital signature and share functionality also.
 
 ## Supported Platforms ##
 
