@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-pdf-viewer-ios",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "cordova pdf viewer plugin",
   "cordova": {
     "id": "cordova-plugin-pdf-viewer-ios",
@@ -39,8 +39,8 @@
   "engines": {
     "cordovaDependencies": {
       "1.0.0": {
-        "cordova": ">=7.1.0",
-        "cordova-ios": ">=4.5.1"
+        "cordova": ">=10.0.0",
+        "cordova-ios": ">=6.0.0"
       }
     }
   },

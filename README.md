@@ -4,8 +4,8 @@ This plugin allows you to view pdf file base64 using ios native library PDFKit a
 
 ## Supported Platforms ##
 
-* iOS 11+
-* Cordova/Phonegap >=7.1.0
+* iOS 13+
+* Cordova/Phonegap >=10.0.0
 
 ## Installation ##
 ```bash

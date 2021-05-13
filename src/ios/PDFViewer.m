@@ -26,11 +26,18 @@
         
         self.pdfDocument = [[PDFDocument alloc] initWithData:[self getBase64Data]];
         
-        self.pdfWebview = [[WKWebView alloc] initWithFrame: self.webView.bounds];
+        /* Get status bar height if visible */
+        UIStatusBarManager *manager = [UIApplication sharedApplication].windows.firstObject.windowScene.statusBarManager;
+        CGFloat height = 0;
+        if(!manager.statusBarHidden) {
+            height = manager.statusBarFrame.size.height;
+        }
         
-        [self setToolbar];
+        self.pdfWebview = [[WKWebView alloc] initWithFrame: CGRectMake(0, height, self.webView.bounds.size.width,self.webView.bounds.size.height - height)];
+        
+        UIToolbar *toolbar = [self setToolbar];
        
-        self.pdfView = [[PDFView alloc] initWithFrame:CGRectMake(0, 50, self.pdfWebview.bounds.size.width, self.pdfWebview.bounds.size.height - 50)];
+        self.pdfView = [[PDFView alloc] initWithFrame:CGRectMake(0, toolbar.bounds.size.height, self.pdfWebview.bounds.size.width, self.pdfWebview.bounds.size.height - toolbar.bounds.size.height)];
         self.pdfView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         self.pdfView.displayMode = [mode integerValue];
         self.pdfView.displayDirection = [direction  isEqual: @"vertical"] ? kPDFDisplayDirectionVertical : kPDFDisplayDirectionHorizontal;
@@ -156,7 +163,7 @@
     return  [UIColor colorWithRed:red/255.0 green:green/255.0 blue:blue/255.0 alpha:alpha_range];
 }
 
--(void)setToolbar {
+-(UIToolbar *)setToolbar {
 
     NSString* toolbarColour = [self.command.arguments objectAtIndex:5];
     NSString* doneBtnColour = [self.command.arguments objectAtIndex:6];
@@ -244,7 +251,8 @@
    [toolbar setItems: items];
    [self.pdfWebview addSubview:toolbar];
    [self.pdfWebview bringSubviewToFront: toolbar];
-
+    
+    return toolbar;
 }
 
 -(NSString*)getPath {
@@ -351,7 +359,7 @@
                 activityViewControntroller.popoverPresentationController.sourceView = sender;
                 activityViewControntroller.popoverPresentationController.sourceRect = sender.bounds;
             } else {
-                activityViewControntroller.popoverPresentationController.sourceView = self.webView;
+                activityViewControntroller.popoverPresentationController.sourceView = self.pdfWebview;
                 activityViewControntroller.popoverPresentationController.sourceRect = CGRectMake(self.pdfWebview.bounds.size.width/2, self.pdfWebview.bounds.size.height/4, 0, 0);
             }
            
@@ -472,6 +480,7 @@
         PKInkingTool* tool = [[PKInkingTool alloc] initWithInkType:PKInkTypePen color:UIColor.blackColor width:10];
         
         [self.canvas setTool:tool];
+        [self.canvas setAllowsFingerDrawing:YES];
         
         [self.signView addSubview:self.canvas];
         [self.signView bringSubviewToFront: self.canvas];
